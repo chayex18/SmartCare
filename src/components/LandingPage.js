@@ -6,7 +6,7 @@ const LandingPage = () => {
     <div>
       <h1>Welcome to the Landing Page!</h1>
       <Link to="/questions">
-        <button>Go to Another Page</button>
+        <button>Start</button>
       </Link>
     </div>
   );
