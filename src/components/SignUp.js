@@ -4,14 +4,40 @@ import { useNavigate } from "react-router-dom";
 const SignUp = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate user registration (You can implement API calls here)
-    console.log("User registered:", { username, password });
-    // Redirect to login page after signup
-    navigate("/dashboard");
+    // Check if the user already exists
+    try {
+      const response = await fetch("http://localhost:5001/users");
+      const users = await response.json();
+      const userExists = users.find((user) => user.username === username);
+
+      if (userExists) {
+        setError("User already exist!");
+        return;
+      }
+
+      // Register the user
+      const newUser = { username, password, name, age, email };
+      await fetch("http://localhost:5001/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser),
+      });
+
+      // Redirect to Dashboard page after signup
+      navigate("/dashboard", { state: { name } });
+    } catch (err) {
+      setError("Failed to communicate with the server.");
+    }
   };
 
   return (
@@ -36,6 +62,35 @@ const SignUp = () => {
             required
           />
         </div>
+        <div>
+          <label>Name:</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>Age:</label>
+          <input
+            type="number"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+
         <button type="submit">Sign Up</button>
       </form>
     </div>

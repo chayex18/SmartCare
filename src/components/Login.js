@@ -4,14 +4,29 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate user login (You can implement API calls here)
-    console.log("User logged in:", { username, password });
-    // Redirect to the landing page after login
-    navigate("/");
+    // Verify user credentials
+    try {
+      const response = await fetch("http://localhost:5001/users");
+      const users = await response.json();
+      const user = users.find(
+        (user) => user.username === username && user.password === password
+      );
+
+      if (user) {
+        console.log("User logged in:", { username });
+        // Redirect to Dashboard page
+        navigate("/dashboard", { state: { name: user.name } });
+      } else {
+        setError("Invalid username or password");
+      }
+    } catch (err) {
+      setError("Failed to communicate with the server.");
+    }
   };
 
   return (
@@ -36,6 +51,7 @@ const Login = () => {
             required
           />
         </div>
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <button type="submit">Log In</button>
       </form>
     </div>
