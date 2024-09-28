@@ -20,12 +20,14 @@ const questions = [
 
 const QuestionsPage = () => {
   const [answers, setAnswers] = useState(Array(questions.length).fill(null));
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (index, value) => {
     const newAnswers = [...answers];
     newAnswers[index] = value;
     setAnswers(newAnswers);
+    setError("");
   };
 
   const totalScore = answers.reduce((acc, curr) => acc + (curr || 0), 0);
@@ -36,13 +38,18 @@ const QuestionsPage = () => {
     : 0;
 
   const handleSubmit = () => {
+    if (answers.includes(null)) {
+      setError("Please answer all questions before submitting.");
+      return;
+    }
+
     // Navigate to results page and pass the scores
     navigate("/results", { state: { totalScore, averageScore } });
   };
 
   return (
     <div>
-      <h1>Questionnaire</h1>
+      <h1>Questions</h1>
       {questions.map((q, index) => (
         <div key={index}>
           <p>{q.question}</p>

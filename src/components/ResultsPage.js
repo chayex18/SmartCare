@@ -16,6 +16,9 @@ const ResultsPage = () => {
       <Link to="/questions">
         <button>Back to Questionnaire</button>
       </Link>
+      <Link to="/signup">
+        <button>Sign Up</button> {/* Sign-up button */}
+      </Link>
     </div>
   );
 };
