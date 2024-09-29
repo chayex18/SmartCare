@@ -139,20 +139,25 @@ const QuestionsPage = () => {
 
     const finalTotalScore = totalScore + bonusPoints;
 
-    // if (answeredQuestions < questions.length) {
-    //   setError("Please answer all questions before submitting.");
-    //   return;
-    // }
     // Check if "Yes/No" question is answered (optional)
     if (answers[4] < 100 && yesNoAnswer === null) {
       setError("Please answer the 'Yes/No' question.");
       return;
     }
+    const physicalActivity = answers[1];
+    const sleepActivity = answers[2];
+    const dietQuality = answers[3];
+    const smokeActivity = answers[4];
+
     // Navigate to results page and pass the scores
     navigate("/results", {
       state: {
         totalScore: finalTotalScore,
         averageScore,
+        physicalActivity,
+        sleepActivity,
+        dietQuality,
+        smokeActivity,
         yesNoAnswer,
         studentAnswer,
         gpaRange,
@@ -161,185 +166,136 @@ const QuestionsPage = () => {
   };
 
   return (
-    <div>
-      <h1>Questions</h1>
+    <div className="min-h-screen bg-white py-12 px-6 lg:px-12">
+      <h1 className="text-4xl font-bold text-primaryRed mb-8 text-center">
+        Wellness Score
+      </h1>
+
       {questions.map((q) => {
-        // Conditionally render the follow-up question
-        if (q.id === 5 && answers[4] >= 100) {
-          return null; // Skip this question if user selected "Don't smoke"
-        }
+        if (q.id === 5 && answers[4] >= 100) return null;
 
         return (
-          <div key={q.id}>
-            <p>{q.question}</p>
-            {q.options.map((option, index) => (
-              <label key={index}>
-                <input
-                  type="radio"
-                  name={`question-${q.id}`}
-                  value={option.score}
-                  checked={answers[q.id] === option.score}
-                  onChange={() => handleChange(q.id, option.score)}
-                />
-                {option.answer} ({option.score} points)
-              </label>
-            ))}
+          <div key={q.id} className="mb-6">
+            <p className="text-lg font-semibold text-gray-800 mb-4">
+              {q.question}
+            </p>
+            <div className="space-y-3">
+              {q.options.map((option, index) => (
+                <label key={index} className="block">
+                  <input
+                    type="radio"
+                    name={`question-${q.id}`}
+                    value={option.score}
+                    checked={answers[q.id] === option.score}
+                    onChange={() => handleChange(q.id, option.score)}
+                    className="mr-2"
+                  />
+                  {option.answer}
+                </label>
+              ))}
+            </div>
           </div>
         );
       })}
 
-      {/* Conditionally render the "Yes/No" question based on previous answer */}
       {answers[4] < 100 && (
-        <div>
-          <p>Do smoke E-cigarrettes</p>
-          <label>
+        <div className="mb-6">
+          <p className="text-lg font-semibold text-gray-800 mb-4">
+            Do you smoke E-cigarettes?
+          </p>
+          <div className="space-y-3">
+            <label className="block">
+              <input
+                type="radio"
+                name="yesNo"
+                value="Yes"
+                checked={yesNoAnswer === "Yes"}
+                onChange={() => handleYesNoChange("Yes")}
+                className="mr-2"
+              />
+              Yes
+            </label>
+            <label className="block">
+              <input
+                type="radio"
+                name="yesNo"
+                value="No"
+                checked={yesNoAnswer === "No"}
+                onChange={() => handleYesNoChange("No")}
+                className="mr-2"
+              />
+              No
+            </label>
+          </div>
+        </div>
+      )}
+
+      <div className="mb-6">
+        <p className="text-lg font-semibold text-gray-800 mb-4">
+          Are you a student?
+        </p>
+        <div className="space-y-3">
+          <label className="block">
             <input
               type="radio"
-              name="yesNo"
+              name="student"
               value="Yes"
-              checked={yesNoAnswer === "Yes"}
-              onChange={() => handleYesNoChange("Yes")}
+              checked={studentAnswer === "Yes"}
+              onChange={() => handleStudentChange("Yes")}
+              className="mr-2"
             />
             Yes
           </label>
-          <label>
+          <label className="block">
             <input
               type="radio"
-              name="yesNo"
+              name="student"
               value="No"
-              checked={yesNoAnswer === "No"}
-              onChange={() => handleYesNoChange("No")}
+              checked={studentAnswer === "No"}
+              onChange={() => handleStudentChange("No")}
+              className="mr-2"
             />
             No
           </label>
         </div>
-      )}
-
-      {/* "Are you a student?" question */}
-      <div>
-        <p>Are you a student?</p>
-        <label>
-          <input
-            type="radio"
-            name="student"
-            value="Yes"
-            checked={studentAnswer === "Yes"}
-            onChange={() => handleStudentChange("Yes", setStudentAnswer)}
-          />
-          Yes
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="student"
-            value="No"
-            checked={studentAnswer === "No"}
-            onChange={() => handleStudentChange("No", setStudentAnswer)}
-          />
-          No
-        </label>
       </div>
 
-      {/* Conditionally render GPA range question if the user is a student */}
       {studentAnswer === "Yes" && (
-        <div>
-          <p>What is your GPA range?</p>
-          <label>
-            <input
-              type="radio"
-              name="gpaRange"
-              value="3.8-4.0"
-              checked={gpaRange === "3.8-4.0"}
-              onChange={() => handleGpaChange("3.8-4.0")}
-            />
-            3.8 - 4.0 (Bonus +5)
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="gpaRange"
-              value="3.5-3.7"
-              checked={gpaRange === "3.5-3.7"}
-              onChange={() => handleGpaChange("3.5-3.7")}
-            />
-            3.5 - 3.7 (Bonus +3)
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="gpaRange"
-              value="3.0-3.4"
-              checked={gpaRange === "3.0-3.4"}
-              onChange={() => handleGpaChange("3.0-3.4")}
-            />
-            3.0 - 3.4 (Bonus +2)
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="gpaRange"
-              value="2.5-2.9"
-              checked={gpaRange === "2.5-2.9"}
-              onChange={() => handleGpaChange("2.5-2.9")}
-            />
-            2.5 - 2.9 (Bonus +1)
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="gpaRange"
-              value="below-2.5"
-              checked={gpaRange === "below-2.5"}
-              onChange={() => handleGpaChange("below-2.5")}
-            />
-            Below 2.5 (No bonus)
-          </label>
+        <div className="mb-6">
+          <p className="text-lg font-semibold text-gray-800 mb-4">
+            What is your GPA range?
+          </p>
+          <div className="space-y-3">
+            {["3.8-4.0", "3.5-3.7", "3.0-3.4", "2.5-2.9", "below-2.5"].map(
+              (range) => (
+                <label key={range} className="block">
+                  <input
+                    type="radio"
+                    name="gpaRange"
+                    value={range}
+                    checked={gpaRange === range}
+                    onChange={() => handleGpaChange(range)}
+                    className="mr-2"
+                  />
+                  {range === "below-2.5" ? "Below 2.5" : range}{" "}
+                  {range !== "below-2.5"}{" "}
+                </label>
+              )
+            )}
+          </div>
         </div>
       )}
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <div>
-        <button onClick={handleSubmit}>Submit</button>
-      </div>
+      {error && <p className="text-red-600 mb-6">{error}</p>}
+
+      <button
+        onClick={handleSubmit}
+        className="w-full py-3 bg-primaryRed text-white font-bold text-lg rounded-lg hover:bg-red-700 transition duration-300"
+      >
+        Submit
+      </button>
     </div>
   );
-  // <div>
-  //   <h1>Questions</h1>
-  //   {questions.map((q) => (
-
-  //     <div key={q.id}>
-  //       <p>{q.question}</p>
-  //       {q.options.map((option) => (
-  //         <label key={option}>
-  //           <input
-  //             type="radio"
-  //             name={`question-${q.id}`}
-  //             value={option.score}
-  //             checked={answers[q.id] === option.score}
-  //             onChange={() => handleChange(q.id, option.score)}
-  //           />
-  //           {option.answer}
-  //         </label>
-  //       ))}
-  //     </div>
-  //   ))}
-  //   {error && <p style={{ color: "red" }}>{error}</p>}
-  //   <div>
-  //     <button onClick={handleSubmit}>Submit</button>
-  //   </div>
-  // </div>
-  // );
 };
-
-// const QuestionsPage = () => {
-//   return (
-//     <div>
-//       <h1>Here are the following questions</h1>
-//       <Link to="/">
-//         <button>Back to Landing Page</button>
-//       </Link>
-//     </div>
-//   );
-// };
 
 export default QuestionsPage;
